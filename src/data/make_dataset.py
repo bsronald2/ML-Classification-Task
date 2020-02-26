@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import click
 import logging
+from src.data.PreProcessing import PreProcessing
+
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 
@@ -13,6 +15,9 @@ def main(input_filepath, output_filepath):
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
+    data_ent = PreProcessing(input_filepath, output_filepath)
+    data_ent.pre_processing()
+    data_ent.set_train_test_data()
     logger.info('making final data set from raw data')
 
 

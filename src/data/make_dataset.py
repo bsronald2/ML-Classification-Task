@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import click
 import logging
-from src.data.PreProcessing import PreProcessing
+from src.data.PrePProcessing import PrePProcessing
+from src.features.SelectFeatures import SelectFeatures
+from src.data.SelectData import SelectData
 
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
@@ -15,9 +17,22 @@ def main(input_filepath, output_filepath):
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
-    data_ent = PreProcessing(input_filepath, output_filepath)
-    data_ent.pre_processing()
-    data_ent.set_train_test_data()
+    # Split data
+    sd = SelectData(input_filepath, output_filepath)
+    sd.select_data()
+    # Pre-processing train data
+    train_pp = PrePProcessing(sd.get__training_features(), sd.get__training_target(), "training")
+    train_pp.data_info()
+    train_pp.clean_data()
+    train_pp.pre_processing()
+
+    # # Pre-processing test data
+    test_pp = PrePProcessing(sd.get__test_features(), sd.get__test_target(), "test")
+    test_pp.pre_processing()
+
+
+    #  python src/data/make_dataset.py data/raw/bank-tr.csv data/processed
+
     logger.info('making final data set from raw data')
 
 

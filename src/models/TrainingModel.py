@@ -80,10 +80,9 @@ class TrainingModel(object):
         print("Accuracy:", metrics.accuracy_score(self.y_test, y_pred))
         print("Confusion Matrix:", metrics.confusion_matrix(self.y_test, y_pred))
         print("Classification Report:\n", metrics.classification_report(self.y_test, y_pred))
-        print('Mean Absolute Error:', metrics.mean_absolute_error(self.y_test, y_pred))
+        print('Mean Absolute Error:', metrics.mean_absolute_error(self.y_test, y_pred))  # the most important
         print('Mean Squared Error:', metrics.mean_squared_error(self.y_test, y_pred))
         print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(self.y_test, y_pred)))
-        pass
 
     def multi_layer_perceptrons(self):
         mlp_model = MLPClassifier(hidden_layer_sizes=(10), alpha=0.0001, activation='tanh',
@@ -144,8 +143,10 @@ class TrainingModel(object):
         print("Confusion Matrix:", metrics.confusion_matrix(self.y_test, y_pred_acc))
         print("Classification Report:\n", metrics.classification_report(self.y_test, y_pred_acc))
 
-        # print('Accuracy Score : ' + str(metrics.accuracy_score(self.y_test, y_pred_acc)))
-        # print('Precision Score : ' + str(metrics.precision_score(self.y_test, y_pred_acc)))
+        print('Accuracy Score : ' + str(metrics.accuracy_score(self.y_test, y_pred_acc)))
+        print('Precision Score : ' + str(metrics.precision_score(self.y_test, y_pred_acc)))
+        print('Mean Absolute Error:', metrics.mean_absolute_error(self.y_test, y_pred_acc))  # the most important
+        print('Mean Squared Error:', metrics.mean_squared_error(self.y_test, y_pred_acc))
         # print('Recall Score : ' + str(metrics.recall_score(self.y_test, y_pred_acc)))
         # print('F1 Score : ' + str(metrics.f1_score(self.y_test, y_pred_acc)))
 

@@ -55,3 +55,15 @@ Project Organization
 --------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
+
+## Steps
+
+
+### Data Cleaning
+- To persist image add parameter input `--image-save`  at the end.
+```buildoutcfg
+$ python src/data/make_dataset.py data/raw/bank-tr.csv data/processed
+```
+
+

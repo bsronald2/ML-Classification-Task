@@ -4,6 +4,8 @@ import numpy as np
 from src.data.data_utils import save_data
 from src.features.SelectFeatures import SelectFeatures
 from sklearn.model_selection import train_test_split
+from src.visualization.visualize import *
+import os
 
 
 class SelectData(object):
@@ -12,6 +14,11 @@ class SelectData(object):
         self.logger = logging.getLogger(__name__)
         self.output_path = output_path
         self.raw_data = pd.read_csv(input_path)
+        self.logger.info(f"Raw Data Info {self.raw_data.shape}")
+        save_image = eval(os.environ['SAVE_IMAGES'])
+        if save_image:
+            visualize.save_image_path = "reports/figures/data"
+            visualize.hist_plot(self.raw_data, "raw_data")
         self.feature_names = None
         self.target_name = "made_deposit"
         self.X = None
@@ -34,8 +41,8 @@ class SelectData(object):
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.33,
                                                                                 random_state=1)
 
-        self.logger.info(f'{self.X_train.shape}  {self.y_train}')
-        self.logger.info(f'{self.X_test.shape}  {self.y_test}')
+        self.logger.info(f'Shape Training Set X and y {self.X_train.shape}  {self.y_train.shape}')
+        self.logger.info(f'Shape Training Set X and y {self.X_test.shape}  {self.y_test.shape}')
         # Save raw test and training data as df
         self.save_slip_data(self.get__training_features(), self.get__training_target(), 'raw_train.csv')
         self.save_slip_data(self.get__test_features(), self.get__test_target(), 'raw_test.csv')

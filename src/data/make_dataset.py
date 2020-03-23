@@ -2,6 +2,7 @@
 import click
 import logging
 from src.data.PrePProcessing import PrePProcessing
+import os
 from src.features.SelectFeatures import SelectFeatures
 from src.data.SelectData import SelectData
 
@@ -12,11 +13,13 @@ from dotenv import find_dotenv, load_dotenv
 @click.command()
 @click.argument('input_filepath', type=click.Path(exists=True))
 @click.argument('output_filepath', type=click.Path())
-def main(input_filepath, output_filepath):
+@click.option('--save-image', is_flag=True, help="Will save data visualisation.")
+def main(input_filepath, output_filepath, save_image):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
+    os.environ['SAVE_IMAGES'] = str(save_image)
     # Split data
     sd = SelectData(input_filepath, output_filepath)
     sd.select_data()

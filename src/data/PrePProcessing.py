@@ -20,6 +20,7 @@ class PrePProcessing(object):
         self.to_drop = None
         self.path_save_image = "reports/figures/data"
         self.data_type = data_type
+        self.save_image = eval(os.environ['SAVE_IMAGES'])
 
         # Drop columns not used for analysis
         self.X_df = self.X_df.drop(['town', 'country', 'accountID', 'poutcome'], axis=1)
@@ -55,13 +56,28 @@ class PrePProcessing(object):
         """
         self.clean_features()
         self.fix_features_typos()
+        self.group_similar_classes()
+
+    def group_similar_classes(self):
+        """
+        Group similar classes into one.
+        """
+        self.X_df["job"].replace(["admin.", "management"], 'management', inplace=True)
+        self.X_df["job"].replace(["blue-collar.", "technician"], 'blue-collar', inplace=True)
+        self.X_df["job"].replace(["self-employed", "entrepreneur"], 'self-employed', inplace=True)
+        self.X_df["married"].replace(["single", "divorced"], 'single', inplace=True)
+
+        if self.save_image:
+            visualize.save_image_path = f'{self.path_save_image}/features'
+            visualize.h_bar_plot(self.X_df["job"].value_counts(), "job_grouped_h_bar")
+            visualize.h_bar_plot(self.X_df["married"].value_counts(), "married_grouped_h_bar")
 
     def clean_features(self):
         self.logger.info("(rows, columns) prior to remove NULL/NaN: {}".format(self.X_df.shape))
         # Drop any rows which have any nans
         self.X_df.dropna()
         # Drop columns if have more than 70% of unknown value. In this case 'poutcome' attribute was removed
-        #self.X_df = self.X_df.loc[:, self.X_df.isin(['unknown']).mean() < 0.7]
+        # self.X_df = self.X_df.loc[:, self.X_df.isin(['unknown']).mean() < 0.7]
         # Drop row from incomplete data
         self.to_drop = self.X_df['last_contact_month'].index[self.X_df['last_contact_month'] == 'j'].tolist()
         self.X_df = self.X_df[self.X_df['last_contact_month'] != 'j']
@@ -80,33 +96,40 @@ class PrePProcessing(object):
         return df
 
     def data_info(self):
-        self.logger.info("Shape X: {}".format(self.X_df.shape))
-        self.logger.info("Shape y: {}".format(self.y_df.shape))
         self.logger.info("Data Head X:\n{}".format(self.X_df.head(5)))
         self.logger.info("Data Head y:\n{}".format(self.y_df.head(5)))
         self.logger.info(f'X Columns type:\n{self.X_df.dtypes}')
         self.logger.info(f'y Columns type:\n{self.y_df.dtypes}')
         self.summarize_data(self.X_df)
         self.summarize_data(self.y_df)
-        #visualize.visualize_data(self.X_df, f'{self.path_save_image}/features')
-        #visualize.visualize_data(self.y_df, f'{self.path_save_image}/target')
+        if self.save_image:
+            visualize.visualize_data(self.X_df, f'{self.path_save_image}/features')
+            visualize.visualize_data(self.y_df, f'{self.path_save_image}/target')
+            visualize.correlation(self.X_df, f'{self.path_save_image}/features/correlation')
+            visualize.scatter_matrix(self.X_df, f'{self.path_save_image}/features/scatter_plot_matrix')
 
     def summarize_data(self, df):
         """
         Summarize data info
         """
+        print("--------------Summarize Data Set Data Type--------------")
         for index, value in df.dtypes.iteritems():
             if value == object:  # Categorical data
-                print(df[index].value_counts())
+                print(df[index].value_counts(normalize=True) * 100) # print count by percentage
             else:
                 print(df[index].describe())
-            print('\n')
+            print("\n")
+        print("--------------------------------------------------------")
 
     def encoding(self):
         """
         Encoding features and save it as csv file
         """
         self.X_df, self.y_df = Encoding(self.X_df, self.y_df).encode()
+        # if self.save_image:
+        #     visualize.correlation(self.X_df, f'{self.path_save_image}/features/correlation_encoded')
+        visualize.correlation(self.X_df, f'{self.path_save_image}/features/correlation_encoded')
+        # visualize.scatter_matrix(self.X_df, f'{self.path_save_image}/features/scatter_encoded')
 
     def clean_target_data(self):
         self.y_df = self.y_df.drop(self.to_drop)
